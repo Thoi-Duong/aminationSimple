@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView imgBackgound2;
     ImageView imgBackgound3;
     Dialog dialog;
+    ImageView img;
+    AnimationDrawable rocketAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,32 +43,36 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        dialog = new Dialog(this);
-        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog = new Dialog(this,R.style.NewDialog);
+        //dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.custom_dialog);
 
-        final ImageView img = (ImageView) dialog.findViewById(R.id.imgAnimate);
+        img = (ImageView) findViewById(R.id.imgAnimate);
         imgBackgound1 = (ImageView) findViewById(R.id.imgBackground1);
         imgBackgound2 = (ImageView) findViewById(R.id.imgBackground2);
         imgBackgound3 = (ImageView) findViewById(R.id.imgBackground3);
+
+        img.setBackgroundResource(R.drawable.run_monster);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        rocketAnimation = (AnimationDrawable) img.getBackground();
+        rocketAnimation.setOneShot(false);
         img.post(new Runnable() {
 
             @Override
             public void run() {
-                ((AnimationDrawable) img.getDrawable()).start();
+
+                rocketAnimation.start();
             }
 
         });
-
-
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-
-
+        Log.e("Animation duaration:::: ",""+rocketAnimation.getDuration(0)*10);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.show();
+                    img.setVisibility(View.VISIBLE);
+
 //                AnimatorSet mAnimationSet = new AnimatorSet();
 //                ObjectAnimator fadeOut = ObjectAnimator.ofFloat(imgBackgound1, View.TRANSLATION_X,  0, -2 * imgBackgound1.getWidth());
 //                fadeOut.addListener(new Animator.AnimatorListener() {
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
                         //MainActivity.this.finish();
                         Intent intent = new Intent(MainActivity.this, NextActivity.class);
-                        dialog.dismiss();
+                       // dialog.dismiss();
                         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                         MainActivity.this.startActivity(intent);
                         MainActivity.this.overridePendingTransition(R.anim.activity_fade_in, R.anim.fade_out);
@@ -166,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         imgBackgound2.animate().translationX(0);
                         imgBackgound1.setVisibility(View.VISIBLE);
                         imgBackgound1.animate().translationX(0);
+                        img.setVisibility(View.GONE);
 //                        imgBackgound3.setVisibility(View.VISIBLE);
 //                        imgBackgound3.animate().translationY(0);
                     }
@@ -201,5 +209,56 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public abstract class CustomAnimationDrawableNew extends AnimationDrawable {
+
+        /** Handles the animation callback. */
+        Handler mAnimationHandler;
+
+        public CustomAnimationDrawableNew(AnimationDrawable aniDrawable) {
+        /* Add each frame to our animation drawable */
+            for (int i = 0; i < aniDrawable.getNumberOfFrames(); i++) {
+                this.addFrame(aniDrawable.getFrame(i), aniDrawable.getDuration(i));
+            }
+        }
+
+        @Override
+        public void start() {
+            super.start();
+        /*
+         * Call super.start() to call the base class start animation method.
+         * Then add a handler to call onAnimationFinish() when the total
+         * duration for the animation has passed
+         */
+            mAnimationHandler = new Handler();
+            mAnimationHandler.postDelayed(new Runnable() {
+
+                public void run() {
+                    onAnimationFinish();
+                }
+            }, getTotalDuration());
+
+        }
+
+        /**
+         * Gets the total duration of all frames.
+         *
+         * @return The total duration.
+         */
+        public int getTotalDuration() {
+
+            int iDuration = 0;
+
+            for (int i = 0; i < this.getNumberOfFrames(); i++) {
+                iDuration += this.getDuration(i);
+            }
+
+            return iDuration;
+        }
+
+        /**
+         * Called when the animation finishes.
+         */
+        abstract void onAnimationFinish();
     }
 }

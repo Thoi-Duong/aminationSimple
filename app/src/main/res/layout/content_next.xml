@@ -12,8 +12,29 @@
 
     <ImageView
         android:id="@+id/imgBackground4"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_centerInParent="true"/>
+    <ImageView
+        android:id="@+id/imgNextAcitivityBackground2"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnshow"
+        android:layout_below="@id/imgBackground4"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorPrimaryDark"/>
+        android:layout_height="50dp"
+        android:text="Show"/>
+    <TextView
+        android:id="@+id/txt_showing"
+        android:layout_below="@+id/btnshow"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Some text showing here"
+        android:visibility="gone"/>
 
 </RelativeLayout>
